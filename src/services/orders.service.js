@@ -1,10 +1,41 @@
-const { orders } = require("../models");
+const { orders, cart, products, products_in_cart, products_in_order } = require("../models");
 
 class OrdersServices {
-  static async create(newOrder) {
+  static async makePurchase(id) {
     try {
-      const result = orders.create(newOrder);
-      return result
+      const userCart = await cart.findOne({ where: { id } });
+      const newOrder = {
+        user_id: id,
+        total_price: userCart.total_price
+      };
+      const result = await orders.create(newOrder);
+      const cartArray = await products_in_cart.findAll({
+        where: { cart_id: userCart.id }
+      });
+      cartArray.forEach(async arrayProduct => {
+        const { product_id, quantity } = arrayProduct;
+        const product = await products.findOne({
+          where: {
+            id: arrayProduct.product_id
+          }
+        });
+        await products_in_order.create({
+          product_id,
+          quantity,
+          order_id: result.id,
+          price: product.price
+        });
+        await products.update({
+          available_qty: product.available_qty - arrayProduct.quantity
+        },
+          {
+            where: { id: arrayProduct.product_id }
+          });
+        await products_in_cart.destroy({
+          where: { cart_id: userCart.id }
+        });
+      });
+      return result;
     } catch (error) {
       throw error;
     }

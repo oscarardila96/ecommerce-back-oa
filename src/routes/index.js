@@ -16,5 +16,8 @@ const routerApi = (app) => {
 module.exports = routerApi;
 
 
+// [Orders]
+// router.post("/", makePurchase)
+
 // [Products In Cart]
 // router.post("/", addProductToCart);

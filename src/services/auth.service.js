@@ -6,8 +6,10 @@ class AuthServices {
   static async register(newUser) {
     try {
       const result = await users.create(newUser);
-      const { id } = result;
-      await cart.create({ user_id: id });
+      if (result) {
+        const { id } = result;
+        await cart.create({ user_id: id });
+      };
       return result;
     } catch (error) {
       throw error;

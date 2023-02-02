@@ -38,6 +38,14 @@ class UsersServices {
       throw error;
     }
   }
+  static async getById(id) {
+    try {
+      const result = users.findByPk(id);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 };
 
 module.exports = UsersServices;

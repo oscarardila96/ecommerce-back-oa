@@ -1,26 +1,27 @@
 const { Router } = require("express");
-const { createOrder } = require("../controllers/orders.controller");
+const { makePurchase } = require("../controllers/orders.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 
 const router = Router();
 
-router.post("/", authMiddleware, createOrder)
+router.post("/:id", authMiddleware, makePurchase);
 
 /**
  * @openapi
- * /api/v1/orders:
+ * /api/v1/orders/{id}:
  *   post:
  *     security:
  *       - bearerAuth: []
- *     summary: Creates a new order into app's database.
+ *     summary: Creates a new order into the app's database, deletes all products from the user's cart and adds the same products to the recently created order.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *         description: User ID
  *     tags: [Orders]
- *     requestBody:
- *       description: Required fields to create a new product.
- *       required: true
- *       content: 
- *         application/json:
- *           schema:
- *             $ref: '#/components/schema/createOrder'
  *     responses:
  *       201:
  *         description: OK
@@ -31,7 +32,7 @@ router.post("/", authMiddleware, createOrder)
  *               properties: 
  *                 message:
  *                   type: string
- *                   example: Order successfully created
+ *                   example: Purchase successfully completed
  *       400:
  *         description: Validation error
  *         content:
