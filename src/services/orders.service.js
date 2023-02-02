@@ -3,7 +3,7 @@ const { orders, cart, products, products_in_cart, products_in_order } = require(
 class OrdersServices {
   static async makePurchase(id) {
     try {
-      const userCart = await cart.findOne({ where: { id } });
+      const userCart = await cart.findOne({ where: { user_id: id } });
       const newOrder = {
         user_id: id,
         total_price: userCart.total_price
@@ -35,6 +35,13 @@ class OrdersServices {
           where: { cart_id: userCart.id }
         });
       });
+      await cart.update({
+        total_price: 0
+      }, {
+        where: {
+          user_id: id
+        }
+      })
       return result;
     } catch (error) {
       throw error;
